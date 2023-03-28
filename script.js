@@ -25,40 +25,46 @@ toggleActive(stopwatch, form, section);
 let stop;
 let x;
 
+//setTime (days, hours, minutes, seconds) function
+let days = 0;
+let hours = 0;
+let minutes = 0;
+let seconds = 0;
+
+const setTime = (now) => {
+  // Calculate days, hours, minutes and seconds
+  days = Math.floor(now / (1000 * 60 * 60 * 24));
+  hours = Math.floor((now % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  minutes = Math.floor((now % (1000 * 60 * 60)) / (1000 * 60));
+  seconds = Math.floor((now % (1000 * 60)) / 1000);
+};
+
+
 //stopwatch counter each second
 const start = document.getElementById('start-stopwatch');
 
 start.addEventListener('click', () => {
   //clear x interval to not affect each others
   clearInterval(x);
+  days = hours = minutes = seconds = 0;
 
   //change the innerText to stop and do stop
   start.classList.toggle('active');
   const lastTime = document.querySelector(".timer").innerHTML;
   document.querySelector(".timer").innerHTML = '';
 
-  let days = 0;
-  let hours = 0;
-  let minutes = 0;
-  let seconds = 0;
-
   if (start.classList.contains('active')) {
     start.innerHTML = 'Stop';
+    const startsAt = new Date().getTime();
+
     stop = setInterval(() => {
       // Display the stopwatch timer
       document.querySelector(".timer").innerHTML = days + "d " + hours + "h "
         + minutes + "m " + seconds + "s ";
 
-      if (seconds < 60) {
-        seconds++;
-      } else if (seconds >= 60) {
-        minutes++;
-      } else if (minutes >= 60) {
-        hours++;
-      } else if (hours >= 24) {
-        days++;
-      }
-
+      // Calculate the time remaining
+      const now = new Date().getTime();
+      setTime(now - startsAt);
     }, 1000);
   } else {
     start.innerHTML = 'Start';
@@ -67,6 +73,7 @@ start.addEventListener('click', () => {
   }
 
 });
+
 
 // Set the date to count down
 const input = document.getElementById('countdown');
@@ -91,12 +98,7 @@ startCountdown.addEventListener('click', (e) => {
   x = setInterval(function () {
     // Calculate the time remaining
     let distance = value * 3.6e+6;
-
-    // Calculate days, hours, minutes and seconds
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    setTime(distance);
 
     // Display the countdown timer
     document.querySelector(".timer").innerHTML = days + "d " + hours + "h "
